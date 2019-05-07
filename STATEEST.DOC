@@ -1,0 +1,67 @@
+
+
+The state estimator is simulated with three programs. 
+
+       1) The loadflow program simulates the power system. To use the state 
+          estimator you must first simulate the power system by running 
+          the loadflow program. The loadflow program requires reading in 
+          the power system network data file and solving for the 
+          voltages. To use the state estimator you then must write out the 
+          voltage solution data file.( see LOADFLOW.DOC ) 
+
+       2) The scada program ( SCADA ) simulates the Supervisory Control And 
+          Data Acquision system. A SCADA system consists of remote terminal 
+          units, communication paths, master station units, and a computer 
+          system to read data directly from the power system and transmmit 
+          and store the measured data into the computer system where it may 
+          be acted upon by the state estimator.
+           
+          In running the scada program the user must enter the power 
+          system network data file name, the network voltage solution data 
+          file name and the measurement data file name. Last, the user 
+          gives the name for the state estimator input file ( see SCADA.DOC ) 
+
+       3) The state estimator program (SE ) reads the state estimator input 
+          file created by the scada program and allows the user to run the 
+          state estimation algorithm, make printouts and alter input data. 
+          ( see SE.DOC ) 
+
+PROGRAM DIMENSIONS ( Applies to LOADFLOW, SCADA AND SE )
+Max number of buses = 25
+Max number of branches ( lines or transformers ) = 40
+Max number of transformers = 10
+Max number of voltage measurements = 25
+Max number of angle measurements = 25
+Max number of injection measurements ( P +jQ ) = 25
+Max number of branch flow measurements ( P + jQ ) = 80
+Total number of measurements ( voltage, angle, injection and branch flow) is
+limited to 100. This means you cannot have all branches measured at each end, 
+plus all injections measured, plus all bus voltages measured. This results 
+from a limitation on the size of the data areas available in TURBO PASCAL.
+
+To create useful exercises, you can run the loadflow and scada programs 
+and then alter the contents of the state estimator input file to simulate 
+bad measurements. All of the files used are ASCII data files and can be 
+edited directly.
+
+Exercises using the state estimator are described in file STATEEST.EXR
+
+Files having to do with the state estimator are:
+
+STATEEST.DOC  <-- Overall document for state estimator
+SCADA.DOC     <-- Scada program documentation
+SCADA.EXE     <-- Scada loaded file
+SCADA.PAS     <-- Scada PASCAL source file
+SE.DOC        <-- State Estimator documentation
+SE.EXE        <-- State estimator loaded file
+SE.PAS        <-- State estimator PASCAL source file
+SIXBUS.DAT    <-- Duplicate six bus base case file
+SIXBUS2.DAT   <-- Six bus system with changes
+SOL6-1.DAT    <-- Solution ourput for SIXBUS.DAT from LOADFLOW
+SOL6-2.DAT    <-- Solution ourput for SIXBUS2.DAT from LOADFLOW
+MEAS6-1.DAT   <-- Measurement data for base six bus system
+MEAS6-2.DAT   <-- Measurement data for second six bus case
+SE6-1.DAT     <-- State estimator input file for base six bus network
+SE6-2.DAT     <-- State estimator input file for second case
+STATEEST.EXR  <-- Sample exercises
+

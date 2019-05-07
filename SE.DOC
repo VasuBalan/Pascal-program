@@ -1,0 +1,552 @@
+SE program Documentation
+
+The state estimator program on the disk was written in Turbo Pascal by David 
+Anderson a student at the University of Minnesota. It uses the full least 
+squares Newton algorithm as described in the text. The exercizes you are to 
+run will show you some of the interesting problems that have to be dealt with 
+in running a state estimator.  
+
+The options are more or less self explanatory and appear as follows:
+
+
+When the state estimator is first called it will ask the use for an input 
+file. This is the state estimator input file produced by the SCADA 
+program. The input files already on the disk are SE6-1.DAT and
+SE6-2.DAT. If you look at the input data it looks like this:
+
+SIXBUS LOAD FLOW SAMPLE SYSTEM
+------------------------------
+6 < -- number of buses in network
+11 <--- number of branches
+LINE    1    2 1.000000E-01 2.000000E-01 2.000000E-02 <-- network data
+LINE    1    4 5.000000E-02 2.000000E-01 2.000000E-02
+LINE    1    5 8.000000E-02 3.000000E-01 3.000000E-02
+LINE    2    3 5.000000E-02 2.500000E-01 3.000000E-02
+LINE    2    4 5.000000E-02 1.000000E-01 1.000000E-02
+LINE    2    5 1.000000E-01 3.000000E-01 2.000000E-02
+LINE    2    6 7.000000E-02 2.000000E-01 2.500000E-02
+LINE    3    5 1.200000E-01 2.600000E-01 2.500000E-02
+LINE    3    6 2.000000E-02 1.000000E-01 1.000000E-02
+LINE    4    5 2.000000E-01 4.000000E-01 4.000000E-02
+LINE    5    6 1.000000E-01 3.000000E-01 3.000000E-02
+V    1     1.0500000000E+00 1.0000E-04 <-- Voltage measurement
+A    1     0.0000000000E+00 1.0000E-04 <-- Angle measurement 
+I    1     1.0787184632E+00 1.0000E-02     2.0661845009E-01 1.0000E-02 <Note 1
+I    2     4.9999997662E-01 1.0000E-02     1.0000000977E+00 1.0000E-02
+I    3     5.9999998886E-01 1.0000E-02     5.9999999981E-01 1.0000E-02
+I    4    -6.9999998096E-01 1.0000E-02    -7.0000000156E-01 1.0000E-02
+I    5    -6.9999998544E-01 1.0000E-02    -6.9999999870E-01 1.0000E-02
+I    6    -6.9999998572E-01 1.0000E-02    -6.9999999611E-01 1.0000E-02
+F    1     2  2.8692958226E-01 1.0000E-02 -1.5370907927E-01 1.0000E-02<Note 2
+F    1     4  4.3642327195E-01 1.0000E-02  2.0994987978E-01 1.0000E-02
+F    1     5  3.5536560904E-01 1.0000E-02  1.5037764958E-01 1.0000E-02
+F    2     1 -2.7788988173E-01 1.0000E-02  1.2769252902E-01 1.0000E-02
+F    2     3  1.6235984680E-02 1.0000E-02 -6.8377435238E-03 1.0000E-02
+F    2     4  3.3625310382E-01 1.0000E-02  4.7475533519E-01 1.0000E-02
+F    2     5  1.5913964961E-01 1.0000E-02  1.9011396619E-01 1.0000E-02
+F    2     6  2.6626112024E-01 1.0000E-02  2.1427601078E-01 1.0000E-02
+F    3     2 -1.6192816564E-02 1.0000E-02 -5.8643777671E-02 1.0000E-02
+F    3     5  1.8031588029E-01 1.0000E-02  1.6516547801E-01 1.0000E-02
+F    3     6  4.3587692513E-01 1.0000E-02  4.9347829947E-01 1.0000E-02
+F    4     1 -4.2534439591E-01 1.0000E-02 -2.0719387096E-01 1.0000E-02
+F    4     2 -3.2042041363E-01 1.0000E-02 -4.6386767810E-01 1.0000E-02
+F    4     5  4.5764828576E-02 1.0000E-02 -2.8938452504E-02 1.0000E-02
+F    5     1 -3.4376001515E-01 1.0000E-02 -1.6841831211E-01 1.0000E-02
+F    5     2 -1.5275868126E-01 1.0000E-02 -2.1200810555E-01 1.0000E-02
+F    5     3 -1.7264611277E-01 1.0000E-02 -1.9947687706E-01 1.0000E-02
+F    5     4 -4.5314578737E-02 1.0000E-02 -4.7162224570E-02 1.0000E-02
+F    5     6  1.4479402489E-02 1.0000E-02 -7.2934479408E-02 1.0000E-02
+F    6     2 -2.5804510998E-01 1.0000E-02 -2.4269807516E-01 1.0000E-02
+F    6     3 -4.2770560888E-01 1.0000E-02 -4.7323343926E-01 1.0000E-02
+F    6     5 -1.4249266862E-02 1.0000E-02  1.5931518316E-02 1.0000E-02
+Q
+
+Note 1: This is an injection measurement: It consists of an identifier I 
+followed by the bus number followed by a puMW meas value , the standard 
+deviation ( sigma ) for the puMW meas, a puMVAR meas value and last of all the 
+standard deviation for the puMVAR value.
+
+Note 2: This is a line flow measurement and consists of the identifier F 
+followed by the line from and to bus numbers ( the sense of the measurement is 
+to be taken as the flow going from the from bus to the to bus ). This is 
+followed by the puMW meas value, puMW sigma, puMVAR meas value and the sigma 
+for the puMVAR meas.
+
+
+Options:
+
+option 1 : Should only be called if you desire to go to another case.
+
+option 2 : Will print out the input data currently loaded
+
+option 3 : Can be used to remove or change a measurement value.
+
+        To remove a voltage measurement enter V space and its bus number and 
+hit enter. To remove an injection measurement enter I a space and its bus 
+number and hit enter. To remove a flow measurement enter F, a space, the from 
+bus number, a space, the to bus number and hit enter.
+
+        To change a measurement you must reenter the measurement line 
+as shown above. That is you enter the identifier, one or two bus numbers, the 
+puKV or MW meas value, sigma, MVAR and sigma. 
+
+option 4 : Uses a pseudo random noise generator to add noise to the 
+measurement values.
+
+option 5: Printing the measurement values shows the input measurement values 
+and the values after adding noise.
+
+option 6 : Runs the state estimator solution. NOTE the value of J as the 
+solution proceeds.
+
+option 7 : The solution printout shows the injections and flows as calculated 
+from the voltages and angles estimated from the measurements.
+
+option 8 : Calculates the individual residuals divided by the sigma of the 
+measurement itself.
+
+option 9 : Calculates the normalized residual. This is the residual or error 
+between the measured value and the value calculated from the state estimator 
+divided by the sigma of the estimated value. See text. This is the sigma to
+be used in identifying bad measurements.
+
+option 10: Prints the residuals.
+
+option 11: Quit.
+
+
+Here is a sample run with the state estimator.
+
+To run the state estimator you simply type SE and hit enter:
+
+Enter name of state estimator data file :SE6-1.DAT  <-- User enters input file 
+                                                        name
+
+Do you want output on printer? (Y or N) Y  <-- Output to printer
+
+Menu of options:
+
+ 1 - Read in a new input data file
+ 2 - Print input data
+ 3 - Edit measurement data
+ 4 - Add noise to measurements
+ 5 - Print measurement data
+ 6 - Run State Estimator
+ 7 - Print solution
+ 8 - Calculate the weighted residuals
+ 9 - Calculate the normalized residuals
+10 - Print the residuals
+11 - Quit
+
+Enter option >4  <-- User enters 4 to add random noise to measured values
+
+Menu of options:
+
+ 1 - Read in a new input data file
+ 2 - Print input data
+ 3 - Edit measurement data
+ 4 - Add noise to measurements
+ 5 - Print measurement data
+ 6 - Run State Estimator
+ 7 - Print solution
+ 8 - Calculate the weighted residuals
+ 9 - Calculate the normalized residuals
+10 - Print the residuals
+11 - Quit
+
+Enter option >3 <-- User enters 3 to edit measured values
+
+Enter option type (V,A,I,F or Q use caps only), bus number(s),
+measurement value(s), sigma(s)
+
+V bus-number per-unit-voltage sigma
+A bus-number phaseangle(in radians) sigma
+I bus-number MW Psigma MVAR Qsigma
+F fbus-number tbus-number MW Psigma MVAR Qsigma
+Q to quit
+
+Enter new measurement data ( or Q to quit) :
+I 4 -75. .01 -75. .01 <-- User indicates that Injection measurement on bus 4
+                          is to be set to -75MW and -75MVAR with sigmas = 0.01 
+                          
+Enter option type (V,A,I,F or Q use caps only), bus number(s),
+measurement value(s), sigma(s)
+
+V bus-number per-unit-voltage sigma
+A bus-number phaseangle(in radians) sigma
+I bus-number MW Psigma MVAR Qsigma
+F fbus-number tbus-number MW Psigma MVAR Qsigma
+Q to quit
+
+Enter new measurement data ( or Q to quit) :
+Q  <--User quits editing measurements
+
+Menu of options:
+
+ 1 - Read in a new input data file
+ 2 - Print input data
+ 3 - Edit measurement data
+ 4 - Add noise to measurements
+ 5 - Print measurement data
+ 6 - Run State Estimator
+ 7 - Print solution
+ 8 - Calculate the weighted residuals
+ 9 - Calculate the normalized residuals
+10 - Print the residuals
+11 - Quit
+
+Enter option >5  <-- User enters 5 to print measurement data
+
+######################## The following appears on the printer #################
+
+File: se6-1.dat
+
+SIXBUS LOAD FLOW SAMPLE SYSTEM
+------------------------------
+
+Number of Voltage Magnitude Measurements = 1
+Number of Voltage Angle Measurements = 1
+Number of Injection Measurements = 6
+Number of Flow Measurements = 22
+
+
+Bus Voltage Magnitude Measurements
+
+           Voltage Magnitude (in pu)   
+        -------------------------------
+Bus     With out     With     Standard 
+Number  Noise        Noise    Deviation
+------  ---------  ---------  ---------
+     1    1.05000    1.04999    0.00010  <-- Note "with noise" value
+
+Bus Voltage Angle Measurements
+
+            Voltage Angle in           
+            Per Unit (i.e. Radians)    
+        -------------------------------
+Bus     With out    With      Standard 
+Number  Noise       Noise     Deviation
+------  ---------  ---------  ---------
+     1    0.00000   -0.00003    0.00010
+
+Bus Injection Measurements
+
+                 Mw Injection                    Mvar Injection         
+        -------------------------------  -------------------------------
+Bus     With out     With     Standard   With out     With     Standard 
+Number  Noise        Noise    Deviation  Noise        Noise    Deviation
+------  ---------  ---------  ---------  ---------  ---------  ---------
+     1    107.872    108.155      1.000     20.662     20.933      1.000
+     2     50.000     49.944      1.000    100.000     98.535      1.000
+     3     60.000     60.359      1.000     60.000     61.013      1.000
+     4    -75.000     NA          1.000    -75.000     NA          1.000 <--1
+     5    -70.000    -68.636      1.000    -70.000    -70.400      1.000
+     6    -70.000    -69.885      1.000    -70.000    -69.640      1.000
+
+Branch Flow Measurements
+
+                        Mw Flow                         Mvar Flow           
+            -------------------------------  -------------------------------
+From  To    With out     With     Standard   With out     With     Standard 
+Bus   Bus   Noise        Noise    Deviation  Noise        Noise    Deviation
+----  ----  ---------  ---------  ---------  ---------  ---------  ---------
+   1     2     28.693     27.713      1.000    -15.371    -16.600      1.000
+   1     4     43.642     42.269      1.000     20.995     21.288      1.000
+   1     5     35.537     35.059      1.000     15.038     17.309      1.000
+   2     1    -27.789    -27.054      1.000     12.769     12.538      1.000
+   2     3      1.624      0.919      1.000     -0.684     -0.862      1.000
+   2     4     33.625     32.599      1.000     47.476     46.202      1.000
+   2     5     15.914     14.448      1.000     19.011     18.652      1.000
+   2     6     26.626     27.595      1.000     21.428     22.362      1.000
+   3     2     -1.619     -2.029      1.000     -5.864     -5.807      1.000
+   3     5     18.032     16.561      1.000     16.517     16.121      1.000
+   3     6     43.588     43.769      1.000     49.348     48.253      1.000
+   4     1    -42.534    -42.286      1.000    -20.719    -21.085      1.000
+   4     2    -32.042    -31.250      1.000    -46.387    -47.797      1.000
+   4     5      4.576      4.564      1.000     -2.894     -3.142      1.000
+   5     1    -34.376    -34.725      1.000    -16.842    -18.162      1.000
+   5     2    -15.276    -16.037      1.000    -21.201    -20.502      1.000
+   5     3    -17.265    -17.548      1.000    -19.948    -20.270      1.000
+   5     4     -4.531     -3.244      1.000     -4.716     -5.954      1.000
+   5     6      1.448     -0.163      1.000     -7.293     -9.349      1.000
+   6     2    -25.805    -26.109      1.000    -24.270    -25.024      1.000
+   6     3    -42.771    -43.346      1.000    -47.323    -47.658      1.000
+   6     5     -1.425      1.086      1.000      1.593      0.446      1.000
+
+
+Menu of options:
+
+ 1 - Read in a new input data file
+ 2 - Print input data
+ 3 - Edit measurement data
+ 4 - Add noise to measurements
+ 5 - Print measurement data
+ 6 - Run State Estimator
+ 7 - Print solution
+ 8 - Calculate the weighted residuals
+ 9 - Calculate the normalized residuals
+10 - Print the residuals
+11 - Quit
+
+Enter option >6 <-- User run state estimator
+Building R inverse.
+
+***********************************************************
+
+                   ITERATION 1
+
+Building H matrix.
+Building H transpose R inverse H.
+Building delta Z.
+Calculating the residual J.
+The residual J is 3.41E+05  <-- Watch this number
+Building H transpose R inverse delta Z.
+Calculating and storing the table of factors.
+Using the table of factors to calculate delta V.
+updating the bus voltages.
+
+Maximum angle mismatch is -0.10318 at bus 6
+Maximum magnitude mismatch is 0.04998 at bus 1
+
+
+***********************************************************
+
+                   ITERATION 2
+
+Building H matrix.
+Building H transpose R inverse H.
+Building delta Z.
+Calculating the residual J.
+The residual J is 1.59E+02
+Building H transpose R inverse delta Z.
+Calculating and storing the table of factors.
+Using the table of factors to calculate delta V.
+Updating the bus voltages.
+
+Maximum angle mismatch is 0.00469 at bus 6
+Maximum magnitude mismatch is 0.00268 at bus 6
+
+
+***********************************************************
+
+                   ITERATION 3
+
+Building H matrix.
+Building H transpose R inverse H.
+Building delta Z.
+Calculating the residual J.
+The residual J is 8.15E+01
+Building H transpose R inverse delta Z.
+Calculating and storing the table of factors.
+Using the table of factors to calculate delta V.
+Updating the bus voltages.
+
+Maximum angle mismatch is -0.00001 at bus 6
+Maximum magnitude mismatch is -0.00000 at bus 4
+
+Building delta Z.
+Calculating the residual J.
+The final value of the residual J is 8.15E+01
+
+Menu of options:
+
+ 1 - Read in a new input data file
+ 2 - Print input data
+ 3 - Edit measurement data
+ 4 - Add noise to measurements
+ 5 - Print measurement data
+ 6 - Run State Estimator
+ 7 - Print solution
+ 8 - Calculate the weighted residuals
+ 9 - Calculate the normalized residuals
+10 - Print the residuals
+11 - Quit
+
+Enter option >7  <-- User prints solution
+
+######################## The following appears on the printer #################
+
+
+State Estimator Solution:
+
+file: se6-1.dat
+
+SIXBUS LOAD FLOW SAMPLE SYSTEM
+------------------------------
+
+From Volt.  Volt.   Mw       Mvar    To    Mw      Mvar    Mva   
+Bus  Mag.   Angle   Injec.   Injec.  Bus   Flow    Flow    Flow  
+---- ------ ------ -------- -------- ---- ------- ------- -------
+
+   1 1.0500 -0.002  107.88   22.09
+                                        2   28.68  -15.05   32.39
+                                        4   43.99   22.04   49.20
+                                        5   35.20   15.11   38.31
+
+   2 1.0493 -3.655   50.18   99.73
+                                        1  -27.79   12.44   30.44
+                                        3    1.35   -1.07    1.72
+                                        4   34.73   48.49   59.64
+                                        5   15.61   18.89   24.50
+                                        6   26.28   20.99   33.63
+
+   3 1.0433 -3.774   60.37   60.63
+                                        2   -1.35   -5.48    5.64
+                                        5   18.01   16.72   24.58
+                                        6   43.70   49.39   65.95
+
+   4 0.9855 -4.206  -71.82  -72.01  <-- Notice that bad values have influenced
+                                        the results of the estimator
+                                        1  -42.85  -21.61   47.99
+                                        2  -33.06  -47.23   57.66
+                                        5    4.10   -3.17    5.18
+
+   5 0.9744 -5.098  -68.82  -70.13
+                                        1  -34.06  -16.97   38.05
+                                        2  -14.98  -21.11   25.89
+                                        3  -17.24  -20.14   26.51
+                                        4   -4.06   -4.44    6.02
+                                        6    1.52   -7.46    7.61
+
+   6 0.9871 -5.644  -69.86  -69.49
+                                        2  -25.48  -23.90   34.93
+                                        3  -42.88  -47.35   63.89
+                                        5   -1.49    1.76    2.31
+
+
+Mw losses   =    7.93
+Mvar Losses =  -29.17
+
+
+Menu of options:
+
+ 1 - Read in a new input data file
+ 2 - Print input data
+ 3 - Edit measurement data
+ 4 - Add noise to measurements
+ 5 - Print measurement data
+ 6 - Run State Estimator
+ 7 - Print solution
+ 8 - Calculate the weighted residuals
+ 9 - Calculate the normalized residuals
+10 - Print the residuals
+11 - Quit
+
+Enter option >9  <-- User runs normalized residual calculation
+Building R inverse.
+Building H matrix.
+Building H transpose R inverse H.
+Calculating and storing the table of factors.
+Using the table of factors, H and R inverse to calculate D inverse.
+Building delta Z.
+
+Menu of options:
+
+ 1 - Read in a new input data file
+ 2 - Print input data
+ 3 - Edit measurement data
+ 4 - Add noise to measurements
+ 5 - Print measurement data
+ 6 - Run State Estimator
+ 7 - Print solution
+ 8 - Calculate the weighted residuals
+ 9 - Calculate the normalized residuals
+10 - Print the residuals
+11 - Quit
+
+Enter option >10  <--User prints normalized residuals
+
+######################## The following appears on the printer #################
+
+
+File: se6-1.dat
+
+SIXBUS LOAD FLOW SAMPLE SYSTEM
+------------------------------
+
+Number of Voltage Magnitude Measurements = 1
+Number of Voltage Angle Measurements = 1
+Number of Injection Measurements = 6
+Number of Flow Measurements = 22
+
+
+Bus Voltage Magnitude Measurements
+
+           Voltage Magnitude (in pu)    
+        --------------------------------
+Bus     With out     With     Normalized
+Number  Noise        Noise    Residual  
+------  ---------  ---------  ----------
+     1    1.05000    1.04999     -2.8892
+
+Bus Voltage Angle Measurements
+
+            Voltage Angle in            
+            Per Unit (i.e. Radians)     
+        --------------------------------
+Bus     With out    With      Normalized
+Number  Noise       Noise     Residual  
+------  ---------  ---------  ----------
+     1    0.00000   -0.00003      0.0000
+
+Bus Injection Measurements
+
+                  Mw Injection                    Mvar Injection         
+        --------------------------------  -------------------------------
+Bus     With out     With     Normalized  With out     With     Normalized
+Number  Noise        Noise    Residual    Noise        Noise    Residual 
+------  ---------  ---------  ----------  ---------  ---------  ---------
+     1    107.872    108.155      0.4008     20.662     20.933     -1.7147
+     2     50.000     49.944     -0.3831    100.000     98.535     -1.9786
+     3     60.000     60.359     -0.0096     60.000     61.013      0.5452
+     4    -75.000     NA         -4.3745    -75.000     NA         -4.0604
+     5    -70.000    -68.636      0.2961    -70.000    -70.400     -0.4256
+     6    -70.000    -69.885     -0.0387    -70.000    -69.640     -0.2081
+
+Branch Flow Measurements
+
+                        Mw Flow                          Mvar Flow            
+            --------------------------------  --------------------------------
+From  To    With out     With     Normalized  With out     With     Normalized
+Bus   Bus   Noise        Noise    Residual    Noise        Noise    Residual  
+----  ----  ---------  ---------  ----------  ---------  ---------  ----------
+   1     2     28.693     27.713     -1.0127    -15.371    -16.600     -1.6102
+   1     4     43.642     42.269     -1.8078     20.995     21.288     -0.7927
+   1     5     35.537     35.059     -0.1504     15.038     17.309      2.2873
+   2     1    -27.789    -27.054      0.7611     12.769     12.538      0.1053
+   2     3      1.624      0.919     -0.4474     -0.684     -0.862      0.2184
+   2     4     33.625     32.599     -2.3474     47.476     46.202     -2.5358
+   2     5     15.914     14.448     -1.1835     19.011     18.652     -0.2425
+   2     6     26.626     27.595      1.3846     21.428     22.362      1.4520
+   3     2     -1.619     -2.029     -0.7075     -5.864     -5.807     -0.3377
+   3     5     18.032     16.561     -1.4954     16.517     16.121     -0.6246
+   3     6     43.588     43.769      0.0727     49.348     48.253     -1.2511
+   4     1    -42.534    -42.286      0.5874    -20.719    -21.085      0.5477
+   4     2    -32.042    -31.250      1.9861    -46.387    -47.797     -0.6149
+   4     5      4.576      4.564      0.4745     -2.894     -3.142      0.0260
+   5     1    -34.376    -34.725     -0.6854    -16.842    -18.162     -1.2304
+   5     2    -15.276    -16.037     -1.0725    -21.201    -20.502      0.6225
+   5     3    -17.265    -17.548     -0.3216    -19.948    -20.270     -0.1314
+   5     4     -4.531     -3.244      0.8270     -4.716     -5.954     -1.5298
+   5     6      1.448     -0.163     -1.7197     -7.293     -9.349     -1.9349
+   6     2    -25.805    -26.109     -0.6582    -24.270    -25.024     -1.1774
+   6     3    -42.771    -43.346     -0.5038    -47.323    -47.658     -0.3299
+   6     5     -1.425      1.086      2.6383      1.593      0.446     -1.3499
+
+
+Menu of options:
+
+ 1 - Read in a new input data file
+ 2 - Print input data
+ 3 - Edit measurement data
+ 4 - Add noise to measurements
+ 5 - Print measurement data
+ 6 - Run State Estimator
+ 7 - Print solution
+ 8 - Calculate the weighted residuals
+ 9 - Calculate the normalized residuals
+10 - Print the residuals
+11 - Quit
+
+Enter option >11 <-- User quits
+

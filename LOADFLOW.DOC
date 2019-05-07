@@ -1,0 +1,387 @@
+LOADFLOW DOCUMENTATION
+
+The program will allow you to solve a loadflow on a system up to 25 buses. You 
+can change the total load, the generator voltage schedules and the generator 
+MW schedules using the change option.
+
+The loadflow program allows the user to run either a Gauss-Seidel or Newton 
+Raphson load flow algorithm, to change the data to set up specific cases and 
+to print out the input data and the solution data. There is also a feature to 
+allow the user to dump the solution voltages to a file so they may be read by 
+other programs.
+
+PROGRAM DIMENSIONS
+Max number of buses = 25
+Max number of branches ( lines or transformers ) = 40
+Max number of generator buses = 20
+Max number of transformers = 10
+
+A file giving the loadflow data for the the sixbus system shown in the text is 
+given in file SIXBUS.DAT. The format of the input file needed for the loadflow 
+program is as follows: 
+
+First and second lines are title lines of up to 80 characters each.
+
+number of buses ( integer up to 30 )
+number of generators
+number of branches ( includes transformers and lines )
+Busnumber of the swing bus
+
+One line for each bus: Each field separated by one space.
+bus number  bus name  p load  qload  volt high limit  volt low limit
+Note: bus name can be eight characters maximum
+
+one line for each generator:
+bus number   p gen  scheduled voltage  q max  qmin
+
+one line for each branch:
+from bus number  to bus number  r  x  bcap   line flow limit  line type(see 
+below)
+
+Note: bcap is one half of line's total charging
+      line type is either LINE or TRAN, if TRAN then follow on same line with
+        tap bus   non-tap bus   tap ratio
+
+
+Here is a listing of file SIXBUS.DAT:
+
+
+SIXBUS LOAD FLOW SAMPLE SYSTEM  <-- Title line 1
+-----------------------------  <-- Title line 2
+6  <-- Number of buses
+3  <-- Number of generators
+11  <-- Number of branches
+1   <-- Bus number for swing bus
+1 BUS-1    0.0 0.0 0.95 1.05  <-- Data for first bus
+2 BUS-2    0.0 0.0 0.95 1.05
+3 BUS-3    0.0 0.0 0.95 1.05
+4 BUS-4    0.7 0.7 0.95 1.05
+5 BUS-5    0.7 0.7 0.95 1.05
+6 BUS-6    0.7 0.7 0.95 1.05
+1 0.0 1.05 1.0 -1.0  <-- Data for first generator
+2 0.5 1.05 1.0 -1.0
+3 0.6 1.07 0.6 -1.0
+1  2  0.10  0.20  0.02    1.0 LINE  <-- Data for first line
+1  4  0.05  0.20  0.02    1.0 LINE
+1  5  0.08  0.30  0.03    1.0 LINE
+2  3  0.05  0.25  0.03    1.0 LINE
+2  4  0.05  0.10  0.01    1.0 LINE
+2  5  0.10  0.30  0.02    1.0 LINE
+2  6  0.07  0.20  0.025   1.0 LINE
+3  5  0.12  0.26  0.025   1.0 LINE
+3  6  0.02  0.10  0.01    1.0 LINE
+4  5  0.20  0.40  0.04    1.0 LINE
+5  6  0.10  0.30  0.03    1.0 LINE
+
+To run the load flow enter LOADFLOW. Program will ask for input data file and 
+then display menu of choices. See sample run below:
+
+
+ Enter name of input data file :SIXBUS.DAT <-- user enters input file name
+
+Do you want output on printer? (Y or N) Y <-- user entered Y to send output
+                                              to the printer
+
+ Menu of options:
+
+1 - print input data
+2 - run Gauss-Seidel loadflow
+3 - run Newton-Raphson loadflow
+4 - print solution
+5 - change input data
+6 - write voltage solution to a file
+7 - quit
+
+Enter option >1 <-- user entered 1 to print out input data
+
+###################################### This will appear on printer ###########
+
+file: sixbus.dat
+
+SIXBUS LOAD FLOW SAMPLE SYSTEM
+-----------------------------
+
+ Number of Buses = 6
+ number of Lines = 11
+ Number of Generators = 3
+ Number of Transformers = 0
+ Swing Bus at bus number 1
+
+
+Bus Data
+
+Bus                                       Voltage     Voltage     Bus  
+Number  Bus Name   Mw Load    Mvar Load   High Limit  Low limit   Type 
+------  --------  ----------  ----------  ----------  ----------  -----
+     1  BUS_1     0.00000     0.00000     0.95000     1.05000  SWING
+     2  BUS_2     0.00000     0.00000     0.95000     1.05000  GEN
+     3  BUS_3     0.00000     0.00000     0.95000     1.05000  GEN
+     4  BUS_4    70.00000    70.00000     0.95000     1.05000  LOAD
+     5  BUS_5    70.00000    70.00000     0.95000     1.05000  LOAD
+     6  BUS_6    70.00000    70.00000     0.95000     1.05000  LOAD
+
+Generator Data 
+
+Bus     Mw          Scheduled  High Mvar  Low MVar 
+number  Generation  Voltage    Limit      Limit    
+------  ----------  ---------  ---------  ---------
+     1     0.00000     1.0500     1.0000    -1.0000
+     2     0.50000     1.0500     1.0000    -1.0000
+     3     0.60000     1.0700     0.6000    -1.0000
+
+Branch Data
+
+From  To    Branch  Branch  Line      Branch     Branch  Tap   Non-Tap  Tap   
+Bus   Bus     R       X     Charging  Mva Limit  Type    Bus   Bus      Ratio 
+----  ----  ------  ------  --------  ---------  ------  ----  -------  ------
+   1     2  0.1000  0.2000  0.020000     1.0000    LIN  
+   1     4  0.0500  0.2000  0.020000     1.0000    LIN  
+   1     5  0.0800  0.3000  0.030000     1.0000    LIN  
+   2     3  0.0500  0.2500  0.030000     1.0000    LIN  
+   2     4  0.0500  0.1000  0.010000     1.0000    LIN  
+   2     5  0.1000  0.3000  0.020000     1.0000    LIN  
+   2     6  0.0700  0.2000  0.025000     1.0000    LIN  
+   3     5  0.1200  0.2600  0.025000     1.0000    LIN  
+   3     6  0.0200  0.1000  0.010000     1.0000    LIN  
+   4     5  0.2000  0.4000  0.040000     1.0000    LIN  
+   5     6  0.1000  0.3000  0.030000     1.0000    LIN  
+
+##############################################################################
+
+ Menu of options:
+
+1 - print input data
+2 - run Gauss-Seidel loadflow
+3 - run Newton-Raphson loadflow
+4 - print solution
+5 - change input data
+6 - write voltage solution to a file
+7 - quit
+
+Enter option >5 <-- user selects option to change input data
+
+Change Input Data Options:
+
+1 - change system load
+2 - change generator scheduled voltage
+3 - change generator scheduled MW
+4 - Return to main menu
+
+Enter option >1  <-- user selects 1 to change load
+
+Present total system MW load =  210.00
+
+Enter new total load MW: 180.0 <-- user enters 180.0 as new total load
+
+ Change Input Data Options:
+
+1 - change system load
+2 - change generator scheduled voltage
+3 - change generator scheduled MW
+4 - Return to main menu
+
+Enter option > 2 <-- user enters 2 to select option to change gen voltages
+
+Present generator voltages are : 
+
+  Generator bus  1 PU sched voltage = 1.050
+  Generator bus  2 PU sched voltage = 1.050
+  Generator bus  3 PU sched voltage = 1.070
+ Enter generator bus number, a space, new PU scheduled voltage
+ (enter 0 0 to terminate ): 1 1.06 <-- user enters 1 to indicate gen on bus 1
+                                       and 1.06 as new gen voltage 
+
+ Present generator voltages are : 
+
+  Generator bus  1 PU sched voltage = 1.060 <-- new voltage now in input data
+  Generator bus  2 PU sched voltage = 1.050
+  Generator bus  3 PU sched voltage = 1.070
+ Enter generator bus number, a space, new PU scheduled voltage
+ (enter 0 0 to terminate ):0 0 <-- user enters 0 0 to escape from this option
+
+ Change Input Data Options:
+
+1 - change system load
+2 - change generator scheduled voltage
+3 - change generator scheduled MW
+4 - Return to main menu
+
+Enter option > 3 <-- user enters 3 to select gen MW changes
+
+Present generator MW schedules are : 
+
+  Generator bus  1 scheduled MW =    0.00
+  Generator bus  2 scheduled MW =   50.00
+  Generator bus  3 scheduled MW =   60.00
+ Enter generator bus number, a space, new scheduled MW 
+ (enter 0 0 to terminate ): 2 55.0 <-- user enters 2 to select gen bus 2 and 
+                                       55.0 as new gen MW on bus 2.
+ Present generator MW schedules are : 
+
+  Generator bus  1 scheduled MW =    0.00
+  Generator bus  2 scheduled MW =   55.00 <-- new gen schedule
+  Generator bus  3 scheduled MW =   60.00
+ Enter generator bus number, a space, new scheduled MW 
+ (enter 0 0 to terminate ): 0 0 <-- user selects 0 0 to escape 
+
+ Change Input Data Options:
+
+1 - change system load
+2 - change generator scheduled voltage
+3 - change generator scheduled MW
+4 - Return to main menu
+
+Enter option >4 <-- user enters 4 to return to main menu
+
+ Menu of options:
+
+1 - print input data
+2 - run Gauss-Seidel loadflow
+3 - run Newton-Raphson loadflow
+4 - print solution
+5 - change input data
+6 - write voltage solution to a file
+7 - quit
+
+Enter option >3 <-- user selects 3 to run Newton load flow
+
+**************************************************************
+
+                    ITERATION 1
+
+The maximum P mismatch is      0.3978
+The maximum Q mismatch is      0.3608
+
+**************************************************************
+
+                    ITERATION 2
+
+The maximum P mismatch is      0.0061
+The maximum Q mismatch is      0.0126
+
+**************************************************************
+
+                    ITERATION 3
+
+The maximum P mismatch is      0.0000
+The maximum Q mismatch is      0.0000
+
+ Gen 3 at max var limit
+**************************************************************
+
+                    ITERATION 4
+
+The maximum P mismatch is      0.0000
+The maximum Q mismatch is      0.1196
+
+**************************************************************
+
+                    ITERATION 5
+
+The maximum P mismatch is      0.0002
+The maximum Q mismatch is      0.0012
+
+**************************************************************
+
+                    ITERATION 6
+
+The maximum P mismatch is      0.0000
+The maximum Q mismatch is      0.0000
+
+
+ Menu of options:
+
+1 - print input data
+2 - run Gauss-Seidel loadflow
+3 - run Newton-Raphson loadflow
+4 - print solution
+5 - change input data
+6 - write voltage solution to a file
+7 - quit
+
+Enter option >4 <-- user selects printout of solution
+
+###################################### This will appear on printer ###########
+
+Load Flow Solution:
+
+file: sixbus.dat
+
+SIXBUS LOAD FLOW SAMPLE SYSTEM
+-----------------------------
+
+From Volt.  Volt.   Mw      Mvar     Mw     Mvar   To    Mw      Mvar    Mva   
+Bus  Mag.   Angle   Load    Load     Gen.   Gen.   Bus   Flow    Flow    Flow  
+---- ------ ------ ------- ------- ------- ------- ---- ------- ------- -------
+
+   1 1.0600  0.000    0.00    0.00   69.74   30.47 
+                                                      2   15.03   -4.23   15.62
+                                                      4   30.15   21.67   37.13
+                                                      5   24.56   13.04   27.81
+
+   2 1.0500 -1.650    0.00    0.00   55.00   49.57 
+                                                      1  -14.83    0.19   14.83
+                                                      3   -0.38   -7.08    7.09
+                                                      4   34.43   32.54   47.38
+                                                      5   14.61   11.74   18.74
+                                                      6   21.17   12.18   24.42
+
+   3 1.0592 -1.698    0.00    0.00   60.00   60.00 
+                                                      2    0.39    0.44    0.59
+                                                      5   19.02   14.04   23.64
+                                                      6   40.59   45.52   60.99
+
+   4 1.0017 -2.609   60.00   60.00 
+                                                      1  -29.49  -23.28   37.57
+                                                      2  -33.38  -32.55   46.62
+                                                      5    2.87   -4.17    5.06
+
+   5 0.9967 -3.286   60.00   60.00 
+                                                      1  -23.94  -17.06   29.40
+                                                      2  -14.24  -14.82   20.55
+                                                      3  -18.33  -17.83   25.57
+                                                      4   -2.85   -3.79    4.74
+                                                      6   -0.64   -6.50    6.53
+
+   6 1.0079 -3.377   60.00   60.00 
+                                                      2  -20.74  -16.26   26.36
+                                                      3  -39.91  -44.25   59.59
+                                                      5    0.66    0.51    0.83
+
+
+  Mw gen                 =  184.74
+  Mvar gen               =  140.05
+  Mw load                =  180.00
+  Mvar load              =  180.00
+  Total I2R Mw losses    =    4.74
+  Total I2X Mvar losses  =   14.81
+  Total charging Mvar    =   54.76
+
+##############################################################################
+ Menu of options:
+
+1 - print input data
+2 - run Gauss-Seidel loadflow
+3 - run Newton-Raphson loadflow
+4 - print solution
+5 - change input data
+6 - write voltage solution to a file
+7 - quit
+
+Enter option >6  <-- user enters 6 to select output of solution
+Enter name of solution data file :SOL6-1.DAT  <-- user enters solution file name
+
+ Menu of options:
+
+1 - print input data
+2 - run Gauss-Seidel loadflow
+3 - run Newton-Raphson loadflow
+4 - print solution
+5 - change input data
+6 - write voltage solution to a file
+7 - quit
+
+Enter option >7 <-- user quits
+
+
+

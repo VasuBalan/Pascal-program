@@ -1,0 +1,273 @@
+UNIT COMMITMENT DOCUMENTATION
+
+This documentation file describes the unit commitment program contained 
+in files UNITCOM.PAS and the executable file UNITCOM.EXE. The user 
+specifies several units and their associated data that are important to 
+running a unit commitment solution as well as a load curve to be met by those 
+units. The options specified at run time allow the user to choose the type of 
+unit list ( priority list or complete enumeration ) as well as parameters 
+associated with the dynamic programming solution. 
+
+***FILES
+
+UNITCOM.DOC   This file
+UNITCOM.PAS   PASCAL source file
+UNITCOM.EXE   PASCAL executable file 
+UNITCOM0.DAT  Debug test case
+UNITCOM1.DAT  Matches example 5E in chapter five of the text
+UNITCOM2.DAT  An eight unit test system ( good to show program run time 
+              differences between priority and enumeration)
+UNITCOM.EXR   Student exercizes with unit commitment
+
+***GENERATION UNIT DATA
+
+The generating unit heat rate curve is represented as a single straight line 
+segment curve as shown chapter five of the text. Therefore only the unit's 
+low limit, high limit, incremental cost, and no load cost are input. The 
+start up cost and fuel cost are also included together with such parameters as 
+minimum down and up time and the initial unit status.
+
+***LOAD CURVE DATA
+
+The load curve is specified as a series of constant MW load periods. 
+Each load period may be any length in hours as set by the user.
+Up to 8 periods of load data may be input.
+
+***INPUT DATA FILE FORMAT
+
+The unit commitment input data file starts with two header lines of up to 80 
+characters each. 
+
+This is followed by a line with a single number equal to the number of 
+generating units represented.
+
+Each generating unit has exactly four lines of data. The first is a dummy line 
+of characters much like the header ( it is ignored by the program and just 
+serves as a label in the data file). The second line contains the unit low 
+limit in MW, the unit high limit in MW and the unit incremental heat rate in 
+Btu/k Wh. The third line contains the unit no load cost in R/h , the 
+unit start up cost in R and the unit fuel cost in R/MBtu. The fourth 
+line contains three integers: the unit minimum up time in hours, the 
+unit minimum down time in hours and the initial unit status in hours 
+(positive being hours up and negative being hours down at the start of 
+the schedule). 
+
+This is followed by another line with two entries containing the number 
+of periods in the load schedule and the length in hours for each period. 
+This is followed by a line with MW load values one for each period in 
+the schedule. 
+
+Example:
+
+This example is for file UNITCOM1.DAT on your disk. The arrow <---- will 
+denote comments and is not on the file.
+
+UNIT COMMITMENT DATA FILE - 8 PERIODS/4 UNITS ( Chapter 5 example )
+-----------------------------------------------------------------
+4                    <---- number of units 
+unit 1 data          <---- dummy "comment line for first unit 
+25.0  80.0  10440.0  <---- unit 1 min MW, max MW, inc heat rate.
+213.0  350.0  2.0    <---- unit 1 no load cost, start up cost, fuelcost 
+4  2  -5             <---- unit 1 min up time, min down time, initial status 
+unit 2 data          <---- dummy line for second unit
+60.0  250.0  9000.0
+585.62 400.0  2.0
+5  3  8
+unit 3 data 
+75.0  300.0  8730.0  
+684.74 1100.0  2.0
+5  4  8  
+unit 4 data
+20.0  60.0  11900.0  
+252.0  0.02 2.0
+1  1  -6
+8  1.0                   <---- number of periods and length period in hours 
+450.0  530.0  600.0  540.0  400.0  280.0  290.0  500.0 <---- load MW values 
+
+
+***PROGRAM MAXIMUM DIMENSIONS
+
+Maximum number of units = 10
+Maximum numbers of periods in the schedule = 8
+Maximum number of states in dynamic programming search = 256
+
+***USER OPTIONS
+
+The user is first asked to enter the name of the unit commitment data file.
+
+Next the user is asked to select priority order or complete enumeration for 
+the solution. NOTE there is only enough storage allocated for 256 states in the 
+dynamic programming search routine. This means that up to an eight unit problem 
+can have complete enumeration. For more than eight units you are limited to 
+priority order.
+
+Next the user is asked for the number of search states in the previous period
+( parameter N in figure 5.6 of text ) and the present period ( parameter X in 
+fig 5.6 ). These have a great influence on solution speed and whether a 
+solution may be reached or not. 
+
+Finally, the user has the option of including or not including minimum up and 
+down constraints.
+
+***SAMPLE PROGRAM EXECUTION
+
+UNITCOM  <---- user starts unitcom program 
+
+ DO YOU WANT OUTPUT ON THE PRINTER? (Y OR N): N <--- user selects crt output
+
+ENTER NAME OF INPUT FILE :  UNITCOM1.DAT  <---- user enters data file name
+
+ 
+ SELECT UNIT ORDER OPTION 
+ 1 - PRIORITY ORDER 
+ 2 - COMPLETE ENUMERATION 
+ 
+ ENTER OPTION NUMBER 1  <---- user picks option 1, priority order
+
+
+ ENTER NUMBER OF SEARCH STATES IN PREVIOUS PERIOD (N) ? 4  <---- user sets N=4
+
+ ENTER NUMBER OF SEARCH STATES IN PRESENT PERIOD (X) ? 4   <---- user sets X=4
+
+ INCLUDE UP/DOWN TIME CONSTRAINTS (Y OR N) :? Y  <---- includes up/down 
+                                                       constraints
+
+ 
+######################### the following appears on the printer ###############
+
+  DATA FILE : unitcom1.dat
+
+UNIT COMMITMENT DATA FILE - 8 PERIODS/4 UNITS ( Chapter 5 example )
+-----------------------------------------------------------------
+ 
+ 
+UNIT DATA
+ 
+UNIT  MIN  MAX   INC   NO LOAD START  FUEL  MIN UP MIN DOWN  INIT
+      MW   MW    COST   COST    COST  COST   HRS    HRS      STATUS
+   1   25   80  10440    213     350    2      4      2        -5
+   2   60  250   9000    586     400    2      5      3         8
+   3   75  300   8730    685    1100    2      5      4         8
+   4   20   60  11900    252       0    2      1      1        -6
+
+LOAD DATA DURING PERIODS OF 1.000 HOURS
+
+PERIOD   LOAD
+          MW
+  1      450.000
+  2      530.000
+  3      600.000
+  4      540.000
+  5      400.000
+  6      280.000
+  7      290.000
+  8      500.000
+
+  PRIORITY ORDER
+
+NUMBER OF SEARCH STATES PREVIOUS PERIOD = 4
+
+NUMBER OF SEARCH STATES PRESENT PERIOD = 4
+
+MIN UP/DOWN CONSTRAINTS ARE INCLUDED
+
+UNIT STATUS TABLE USED IN DYNAMIC PROGRAMMING SEARCH
+ 
+STATE  UNIT STATUS
+         1   2   3   4 
+----------------------- 
+   1    OFF OFF ON  OFF 
+   2    OFF ON  ON  OFF                <----- priority order state table
+   3    ON  ON  ON  OFF 
+   4    ON  ON  ON  ON  
+ 
+ INITIAL CONDITIONS
+STATE  UNIT STATUS       PCOST  PATH    FCOST
+        1   2   3   4     R/HR            R
+---------------------------------------------- 
+  2    -5   8   8  -6        0.    0   0          <---- initial conditions
+ 
+PERIOD  1    SYSTEM LOAD  450 
+STATE  UNIT STATUS       PCOST  PATH    FCOST
+        1   2   3   4     R/HR            R
+---------------------------------------------- 
+  2    -6   9   9  -7     9208    2   9208.361 
+  3     1   9   9  -7     9493    2   9843.361          <---- period 1 paths
+  4     1   9   9   1     9861    2   10211.38 
+ 
+PERIOD  2    SYSTEM LOAD  530 
+STATE  UNIT STATUS       PCOST  PATH    FCOST
+        1   2   3   4     R/HR            R
+---------------------------------------------- 
+  2    -7  10  10  -8    10648    2   19856.72 
+  3     1  10  10  -8    10933    2   20491.72           <---- period 2 paths
+  4     1  10  10   1    11301    2   20859.74 
+ 
+PERIOD  3    SYSTEM LOAD  600 
+STATE  UNIT STATUS       PCOST  PATH    FCOST
+        1   2   3   4     R/HR            R
+---------------------------------------------- 
+  3     1  11  11  -9    12265    2   32472.08 
+  4     1  11  11   1    12576    2   32782.5 
+ 
+PERIOD  4    SYSTEM LOAD  540 
+STATE  UNIT STATUS       PCOST  PATH    FCOST
+        1   2   3   4     R/HR            R
+---------------------------------------------- 
+  3     2  12  12 -10    11113    3   43585.44 
+  4     2  12  12   1    11481    3   43953.46 
+ 
+PERIOD  5    SYSTEM LOAD  400 
+STATE  UNIT STATUS       PCOST  PATH    FCOST
+        1   2   3   4     R/HR            R
+---------------------------------------------- 
+  3     3  13  13 -11     8593    3   52178.8 
+  4     3  13  13   1     8964    3   52549.53 
+ 
+PERIOD  6    SYSTEM LOAD  280 
+STATE  UNIT STATUS       PCOST  PATH    FCOST
+        1   2   3   4     R/HR            R
+---------------------------------------------- 
+  3     4  14  14 -12     6490    3   58668.86 
+  4     4  14  14   1     6869    3   59047.68 
+ 
+PERIOD  7    SYSTEM LOAD  290 
+STATE  UNIT STATUS       PCOST  PATH    FCOST
+        1   2   3   4     R/HR            R
+---------------------------------------------- 
+  3     5  15  15 -13     6665    3   65333.52 
+  4     5  15  15   1     7043    3   65712.34 
+ 
+PERIOD  8    SYSTEM LOAD  500 
+STATE  UNIT STATUS       PCOST  PATH    FCOST
+        1   2   3   4     R/HR            R
+---------------------------------------------- 
+  2    -1  16  16 -14    10108    3   75441.88 
+  3     6  16  16 -14    10393    3   75726.88 
+  4     6  16  16   1    10761    3   76094.9 
+ 
+ OPTIMUM COMMITMENT SCHEDULE 
+ 
+TOTAL COST =  75441.88        <---- final optimum cost
+ 
+PERIOD  STATE  UNIT STATUS       PCOST       LOAD
+               1   2   3   4      R/HR        MW
+-------------------------------------------------
+  8      2    OFF ON  ON  OFF    10108      500.0
+  7      3    ON  ON  ON  OFF     6665      290.0
+  6      3    ON  ON  ON  OFF     6490      280.0
+  5      3    ON  ON  ON  OFF     8593      400.0         <---- final schedule
+  4      3    ON  ON  ON  OFF    11113      540.0
+  3      3    ON  ON  ON  OFF    12265      600.0
+  2      2    OFF ON  ON  OFF    10648      530.0
+  1      2    OFF ON  ON  OFF     9208      450.0
+
+
+
+##############################################################################
+
+DO YOU WANT TO RUN UNITCOM AGAIN? (Y OR N) :? N <---- user exits
+
+
+See UNITCOM.EXR file for exercises for students.
+

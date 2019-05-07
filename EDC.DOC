@@ -1,0 +1,365 @@
+DOCUMENTATION FOR THE ECONOMIC DISPATCH PROGRAM EDC.BSF
+
+The economic dispatch program allows a student to experiment with two commonly 
+used economic dispatch solution algorithms using three different generating 
+unit heat rate or incremental heat rate curve representations.
+
+The user specifies the unit heat rate or incremental heat rate, fuel cost, and 
+operating limits for each unit on a data file. If fixed bus penalty factors or 
+a loss matrix are to be used they are also entered on the file. The user is 
+then allowed the option of trying two different solution algorithms and can 
+enter different total load or generation MW values. Diagnostic output of the 
+solution process is also available as an option.
+
+***FILES
+
+EDC.DOC   This file 
+EDC.PAS   PASCAL Source file
+EDC.EXE   PASCAL Executable program file
+EDC1.DAT  Polynomial curves, three units, no loss test case 
+EDC2.DAT  Piecewize incremental heat rate curves, three units, no loss test case
+EDC3.DAT  Piecewize heat rate, three units, no loss test case
+EDC4.DAT  Polynomial curves, three units, constant penalty factors test case
+EDC5.DAT  Polynomial curves, three units, loss formula case
+
+EX3A.DAT  Data for example 3A in chapter 3 of text
+EX3B.DAT  Data for example 3B in chapter 3 of text
+EX3C.DAT  Data for example 3C in chapter 3 of text
+EX3D.DAT  Data for example 3D in chapter 3 of text
+   
+PR32 .DAT  Data for problem 3.2 in text
+PR33.DAT  Data for problem 3.3 in text
+PR38.DAT  Data for problem 3.8 in text
+PR43A.DAT Data for problem 4.3 part A in text
+PR43B.DAT Data for problem 4.3 part B in text
+
+
+***GENERATING UNIT DATA
+
+The generating unit heat rate or incremental heat rate data is stored on the 
+input data file. Three curve types may be used as explained below. All 
+generating units must have the same type and the same curve order.
+
+POLY: Stands for polynomial curve representation of the heat rate
+      function. That is, the curve represents the function:
+
+           H(P) = A + B*P + C*P**2 + D*P**3 + ...
+
+      The input file must contain the order for this polynomial. If the order
+      is set to 2 the file must specify coefficients A,B, and C. If order is 
+      set to 3 the file must specify A,B,C and D. Etc.
+
+PINC: Stands for piecewize incremental heat rate curve. The curve is 
+      represented by a series of points connected by straight line segments.
+      The number of segments in the curve is determined by the order parameter.
+      Each point requires a MW value and an incremental heat rate value.
+      The input file then must contain points such as the table below:
+
+          MW | Inc. Heat Rate
+       -----------------------
+         P1  |  IHR1
+         P2  |  IHR2
+         P3  |  IHR3
+           This example has an order of 2 since the three points specify
+           two segments.
+
+      The user is cautioned that the first point's MW value ought to be equal 
+      to the unit low limit and the last MW point equal to the unit high limit.
+      In addition:
+
+        P(I) < P(I+1)        
+        IHR(I) < IHR(I+1)   
+      
+      for all points in the curve.
+
+PIO:  Stands for piecewize Input/Output curve. Here the unit's heat rate curve
+      is represented as a series of points connected by straight line segments.
+      The number of segments in the curve is determined by the order parameter.
+      Each point requires a MW value and a heat rate value.
+      The input file then must contain points such as the table below:
+
+          MW | Inc. Heat Rate
+       -----------------------
+         P1  |  HR1
+         P2  |  HR2
+         P3  |  HR3
+         P4  |  HR4
+           This example has an order of 3 since the four points specify
+           three segments.
+
+      The user is cautioned that the first point's MW value ought to be equal 
+      to the unit low limit and the last MW point equal to the unit high limit.
+      In addition:
+
+        P(I) < P(I+1)        
+        HR(I) < HR(I+1)   
+      
+      for all points in the curve.
+
+***LOSS REPRESENTATION
+
+Network losses may ignored, may be represented by fixed penalty factors or
+by a loss matrix ( B Matrix ). The format for entering the loss representation 
+type and values is given in the next section on file format.
+
+***INPUT DATA FILE FORMAT
+
+The format for the input data file is as follows:
+
+The first two lines are file labels and may be any character string up to 80 
+characters long. 
+
+The third line contains four parameters. They are:
+
+FIRST PARAMETER = The number of generating units represented
+SECOND PARAMETER= The type of curve used to represent the unit. This parameter
+                  is limited to three different character string values
+                  of POLY or PINC or PIO as explained above.
+THIRD PARAMETER = Contains an integer of 1 to 10 giving order of the curve as 
+                  explained above. 
+FOURTH PARAMETER= The loss representation. This parameter is limited to three
+                  different character string values of NOLOSS or CONSTPF or
+                  LOSSFORM denoting noloss, constant penalty factors and loss
+                  matrix respectively.
+
+Next comes the unit data. Each unit has one line of data giving the unit's 
+name (an alphanumeric string up to 9 characters), its low MW limit, its high 
+MW limit and its fuel cost. Each variable is separated by a space. Next each 
+polynomial curve coefficient or each piecewize curve breakpoint is given with 
+each value on a separate line.  
+
+The sample below is for the file EX3A.DAT on your disk. The arrow <---- will 
+be used together with lower case text to show comments only ( nothing to the 
+right of the arrow nor the arrow itself is actually on the file).
+
+Example:
+ 
+FILE EX3A.DAT -------- DATA FOR EXAMPLE 3A IN TEXT <---- 1st header line
+-------------------------------------------------- <---- 2nd header line
+3  POLY  2  NOLOSS <---- number of units, curve type, curve order, loss type
+UNIT1  150.0  600.0 1.1 <----start of first unit's data
+510.0    <---- A coefficient for polynomial for first unit
+7.2      <---- B coefficient
+0.00142  <---- C coefficient
+UNIT2  100.0 400.0 1.0 <---- Start of second unit's data
+310.0
+7.85
+0.00194
+UNIT3  50.0 200.0 1.0 <---- Start of third unit's data
+78.0
+7.97
+0.00482
+
+The next example shows unit data having a piecewize heat rate curve with five 
+segments is represented on the input file.
+
+FILE EDC3.DAT ------ PIECEWIZE INPUT/OUTPUT CURVES, NO LOSSES
+-------------------------------------------------------------
+3  PIO  5  NOLOSS
+UNIT1  100.0 200.0  1.0
+100.0  10200.0 <---- MW and heat rate point values
+120.0  14620.0
+140.0  19840.0
+160.0  25860.0
+180.0  32680.0
+200.0  40300.0
+UNIT2  50.0  300.0  1.0
+50.0  10000.0
+100.0  15000.0
+150.0  22500.0
+200.0  32500.0
+250.0  45000.0
+300.0  60000.0
+UNIT3  200.0  700.0  1.0
+200.0  10000.0
+300.0  15000.0
+400.0  21000.0
+500.0  28000.0
+600.0  36000.0
+700.0  45000.0
+
+The next example shows how to input constant penalty factors into the data 
+file. This is a copy of file EDC4.data on your disk:
+
+FILE EDC4.DAT ------ POLYNOMIAL CURVES, CONSTANT PENALTY FACTORS
+----------------------------------------------------------------
+3  POLY  2  CONSTPF
+UNIT1  100.0 200.0 1.0
+100.0
+1.0
+1.0
+UNIT2  50.0  150.0  1.0
+100.0
+1.0
+1.0
+UNIT3  200.0  450.0  1.0
+10.0
+1.0
+1.0            <---- Last line of unit 3 data
+1.0  1.2  1.0 <---- Penalty factors listed in order of units.( Unit 1 penalty 
+                    factor = 1.0, unit 2 penalty factor = 1.2, etc.)
+
+Finally the next example shows how to enter a lossformula with the unit 
+data.This is a copy of EDC5.dat on your disk:
+
+FILE EDC5.DAT ------ POLYNOMIAL CURVES, B MATRIX LOSS FORMULA
+-------------------------------------------------------------
+3  POLY  2  LOSSFORM
+UNIT1  100.0  200.0  1.0
+100.0
+1.0
+1.0
+UNIT2  50.0  150.0  1.0
+100.0
+1.0
+1.0
+UNIT3  200.0  450.0  1.0
+10.0
+1.0
+1.0                <---- Last line of unit 3 data
+0.005              <---- B00 coefficient
+0.005 0.005 0.01   <---- B1, B2, B3 coefficients
+0.01  0.005 0.005  <---- B11, B12, B13
+0.005 0.01  0.005  <---- B21, B22, B23
+0.005 0.005 0.02   <---- B31, B32, B33
+
+Note that the Loss formula coefficients are entered as follows: The first line 
+contains the B00 coefficient, The second contains the B(I) coefficients for 
+I = 1 to the number of generators, the matrix portion of the formula is stored 
+row by row. There will be as many rows as there are units.
+
+
+***USER OPTIONS
+
+When a data file is complete the user runs the EDC program by entering
+EDC and then hitting enter.
+
+First the program asks if the user wants to display the program output 
+on the printer or the CRT.
+
+The program then prompts for the data file to be read. The user should enter 
+the file name followed by the ENTER key. ( NOTE all entries into the program 
+assume the user enters a number or letter(s) followed by ENTER).
+
+The solution method allows the user to select either lambda search or table 
+lookup. Note that lambda search is appropriate for polynomial or piecewize 
+incremental heat rate curves and table look up should be used for piecewize 
+heat rate curves.
+
+Diagnostic printout can be obtained by answering Y or y to the next question 
+and will show the results of the lambda search.
+
+The schedule type allows the program to match total generation to a fixed 
+total generation value ( option 1 ) or matches the total generation to the 
+load plus losses ( option 2 ). 
+
+If option 1 is selected the user is prompted for the MW total generation to 
+use.
+
+If option 2 is selected the user enters the total load. If the loss 
+formula is used the program calculates the losses and adds it to the 
+load MW as the target total generation. 
+
+The program then prints the file header followed by a printout of the unit and 
+loss formula data. After the solution is complete the program prints out 
+a summary of the generation. The user is asked if another run of EDC is 
+desired and can enter Y or N to continue or not. If Y is entered, the 
+user can opt to read a new data file or use the one previously read. 
+
+***PROGRAM MAXIMUM DIMENSIONS
+
+Maximum number of generator units = 20
+Maximum number of points on piecewize linear curve segments = 10
+Maximum number of polynomial coefficients = 10
+
+***SAMPLE PROGRAM EXECUTION
+
+edc <---- user starts program 
+
+Do you want output on the printer? (y or n)  y <---- user asks for printer 
+
+enter name of input file? ex3a.dat <---- user enters file name
+
+
+please enter solution method : 
+   1 = lambda search 
+   2 = table lookup ( pio curves only ) 
+ 
+enter 1,or 2 : ? 1                        <---- user enters solution option
+
+do you want diagnostic printout ? (y/n) : ? y <---- user selects diagnostics
+
+please enter schedule type 
+   1 = total generation ( mw ) 
+   2 = total load ( mw ) 
+ 
+enter schedule type ? 1                   <---- user selects schedule type
+
+enter total generation ( mw ) :? 850.     <---- user selects total MW
+
+The output below appears on either the crt or the printer
+
+
+FILE EX3A.DAT -------- DATA FOR EXAMPLE 3A IN TEXT <--start of data printout
+--------------------------------------------------
+ 
+ 
+ number of generator units =  3 
+ unit curve type = poly
+ curve order =  2 
+ network loss representation = noloss
+ 
+UNIT1 limits =  150   600  fuelcost =  1.1 
+ curve coefficients
+   510.0000       
+     7.2000       
+     0.0014   
+ 
+UNIT2 limits =  100   400  fuelcost =  1 
+ curve coefficients
+   310.0000       
+     7.8500       
+     0.0019   
+ 
+UNIT3 limits =  50   200  fuelcost =  1 
+ curve coefficients
+    78.0000       
+     7.9700       
+     0.0048   
+
+using lambda search
+
+ total generation schedule =         850.0
+ losses negnected
+ 
+
+ lambda limits =  8.238     9.898          <---- start of diagnostic output
+ lambdastart deltalambda =  9.068         .83 
+ targetgen =  850 
+ lambda =  9.068             totalgen =  795.2956 <---- iteration on lambda 
+ lambda =  9.898             totalgen =  1200 
+ lambda =  9.483             totalgen =  1057.27 
+ lambda =  9.275499          totalgen =  936.7207 
+ lambda =  9.171749          totalgen =  866.0078 
+ lambda =  9.119874          totalgen =  830.6513 
+ lambda =  9.145811          totalgen =  848.3291 
+ lambda =  9.15878           totalgen =  857.1684 
+ lambda =  9.152296          totalgen =  852.749 
+ lambda =  9.149054          totalgen =  850.539 
+ lambda =  9.147432          totalgen =  849.4342 
+ lambda =  9.148243          totalgen =  849.9868 
+ 
+generator  output   limit  inc cost penalty fact  operating cost <---- output
+             mw             $/mwhr                   $/hr       
+---------  ------   -----  -------- ------------  --------------
+unit1       393.2             9.148   1.000           3916.31
+unit2       334.6             9.148   1.000           3153.80
+unit3       122.2             9.148   1.000           1124.13
+---------  ------                                 --------------
+ totals     850.0                                     8194.24
+ 
+ lambda =  9.14824
+ 
+ 
+do you want to run edc again? (y or N) : ? n <---- user does not reexecute
+

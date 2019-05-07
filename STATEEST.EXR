@@ -1,0 +1,39 @@
+STATE ESTIMATOR EXERCISES
+
+
+PROBLEM 1:
+
+Run SE and tell it to use SE6-1.DAT.
+
+1) Print the input data
+2) Run the estimator solution
+3) Print the solution 
+4) Add noise ( option 4 )
+5) Rerun the solution
+6) Print the solution again ( observe the difference)
+7) Calculate normalized residuals
+8) Print the residuals.
+9) set flow meas from bus 1 to bus 2 to 35 MW and -20MVAR by entering option 3
+        and entering:  F 1 2 0.35 .01 -.20 .01  then hit enter and then 
+        enter Q to quit option 3.
+10) Rerun the estimator ( note J )
+11) Recalculate the normalized residuals
+12) Print the residuals ( Does meas F 1 2 stand out??)
+
+PROBLEM 2:
+
+Run SE and select SE6-2.DAT.  You are now presented with the following 
+problem: Not all the measurements in the first case above are available.  Some 
+of the measurements are a little bit bad and one of them is VERY BAD.  Find 
+all the bad measurements, remove them and print out the solution of the 
+network and show what the true loads and generation values were. NOTE when all 
+of the bad meas have been found you should get a perfect state estimate ( ie J 
+will equal zero ). If you remove too many measurements you get no solution - 
+and you must restart. 
+
+This will require repeated state estimator solutions, calculation of normalized 
+residuals and then removal of measurements. DO NOT try to correct the bad 
+measurements, just remove them.
+
+
+

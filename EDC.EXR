@@ -1,0 +1,31 @@
+
+***INTERESTING EXPERIMENTS WITH EDC
+
+The EDC program is designed to allow students to try problems that will teach 
+them about power system operations calculations without burdening them with 
+hours of tedious calculations. To effectively use the program you will of 
+course need to be able to use a text editor that can operate on unformatted 
+ASCII files. Using the text editor you can create your own variations on the 
+existing data files as well as create new data files. 
+
+To start you might try changing some of the fuel costs in the EX3A.DAT file to 
+see what happens to the resulting dispatch. Similarly you should try changing 
+the penalty factors in EDC4.DAT. 
+
+You can experiment with EDC5.DAT to see what happens when you specify a total
+generation versus a total load. Note that in the total generation case the 
+penalty factors calculated from the loss formula change each iteration while
+the total load case has varying losses as well as varying penalty factors to 
+contend with.
+
+The EDC3.dat file affords an interesting experiment to see how a lambda search 
+routine comes up with a false solution compared to the table lookup solution.
+
+In addition, example 4E and homework problems 3.2, 3.8, and 4.3 can be solved 
+using EDC. Note that problem 3.8 will require that you create a third segment 
+for the first unit's curve ( I suggest you add the point 300.,9909. between 
+the second and third points ). Also note that if you attempt to set up problem
+4.3 that the program assumes that the loss formula uses per unit generator
+output ( base 100MVA ) so that the numbers in prob 4.3 must be adjusted by
+multiplying all the B(I,J) by 1.0E+04 to get the correct losses.
+

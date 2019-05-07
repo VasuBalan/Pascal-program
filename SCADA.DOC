@@ -1,0 +1,110 @@
+SCADA Documentation
+
+           The SCADA program simulates the functions performed by an on 
+      line Supervisory Control And Data Acquision system. The idea is to 
+      simulate the power system network, calculate all the voltages, P and 
+      Q flows, P and Q injections, etc. on the system and then associate 
+      these quantities with a specification of where measurements are 
+      being made on the system.
+
+           The power system network is simulated by reading into SCADA the 
+      same network data file read into the loadflow program. This file 
+      specifies the network topology and the impedances of the branches.
+      The net P and Q injection specifications on the file are not used 
+      by SCADA. You also need to read in the voltage solution file 
+      produced by the loadflow. By specifying the voltage at each bus 
+      SCADA can calculate the net injection at each bus as well as the 
+      power flowing at each end of each branch of the network.
+
+           To complete the SCADA simulation we need a file that specifies 
+      where each measurement is located and how good that measurement is 
+      considered as reflected by specifying its standard deviation 
+      (sigma). This data is captured in a measurement description data 
+      file that looks like the file below: (see file MEAS6-1.DAT on you disk). 
+
+SIXBUS LOAD FLOW SAMPLE SYSTEM <-- Title line1
+------------------------------ <-- Title line2
+V    1   0.0001          < Bus voltage magnitude meas ( V Bus no. sigma )
+A    1   0.0001          < Bus angle measurement ( A Bus no. sigma )
+I    1   0.01   0.01     < Bus P+jQ injection meas ( I Bus No. Psigma Qsigma)
+I    2   0.01   0.01                
+I    3   0.01   0.01
+I    4   0.01   0.01
+I    5   0.01   0.01
+I    6   0.01   0.01
+F    1   2  0.01  0.01  < Branch P+jQ flow meas ( F Fbus  Tbus Psigma  Qsigma)
+F    1   4  0.01  0.01              
+F    1   5  0.01  0.01
+F    2   1  0.01  0.01
+F    2   3  0.01  0.01
+F    2   4  0.01  0.01
+F    2   5  0.01  0.01
+F    2   6  0.01  0.01
+F    3   2  0.01  0.01
+F    3   5  0.01  0.01
+F    3   6  0.01  0.01
+F    4   1  0.01  0.01
+F    4   2  0.01  0.01
+F    4   5  0.01  0.01
+F    5   1  0.01  0.01
+F    5   2  0.01  0.01
+F    5   3  0.01  0.01
+F    5   4  0.01  0.01
+F    5   6  0.01  0.01
+F    6   2  0.01  0.01
+F    6   3  0.01  0.01
+F    6   5  0.01  0.01
+Q    < End of measurements delimiter
+
+         The user must tell SCADA the name of the measurement description data 
+      file so it can be read in. The SCADA program now has all necessary 
+      information to produce the state estimator input file. This file 
+      contains the network topology, impedances and measurement 
+      information sufficient to run the state estimator. The measurement 
+      data in the state estimator input file has the measurement location 
+      in the network along with the measured value from that location and 
+      the measurement's sigma values. The user must specify the name given 
+      to the state estimator input file.
+
+      A sample run of SCADA is shown below:
+From the operating system user enters SCADA and hits ENTER. The user then has 
+to enter four file name as described above:
+
+Enter name of load flow data file :SIXBUS.DAT  <-- User entered loadflow data 
+                                                   file name
+
+Enter name of solution data file :SOL6-1.DAT <-- User entered file name for 
+                                                 loadflow solution voltages
+
+Enter name of measurement data file :MEAS6-1.DAT <-- User entered file name 
+                                                     for measurements data.
+
+Enter name of state estimator data file :SE6-1.DAT <-- User entered name of 
+                                                       file on which SCADA 
+                                                       writes input data for
+                                                       state estimator.
+
+
+           NOTE that the measured values in the state estimator input file 
+      are "perfect" values, that is, they equal exactly the voltages, 
+      injections and flow values that the load flow calculated. If You run 
+      the state estimator on these values directly you should be able to 
+      drive the state estimator's residual to virtually zero. However, a 
+      real SCADA system will not have perfect measured values. Most of the 
+      measured values will be in error by a slight amount ( corresponding 
+      to random noise effects, transducer error, etc. ). Some of the 
+      measurements will be in error by a large amount and we refer to 
+      these as "bad" measurements.
+
+           The measurement errors can be simulated in two ways. Small 
+      random errors can be added to the measurements in the state 
+      estimator itself ( see SE.DOC ) using a psuedo random noise 
+      generator that produces an error proportional to the measurement's 
+      sigma. Large random errors can be simulated by outright changes to 
+      the measured values either by editing the state estimator input data 
+      file or using the editing functions in the SE program itself.
+     
+      An interesting exercise for you students is to run the loadflow 
+      program and SCADA program and then edit the state estimator input 
+      data program and ask the students to "find" the bad data using the 
+      normalized residual calculation.

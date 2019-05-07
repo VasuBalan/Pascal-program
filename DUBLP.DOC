@@ -1,0 +1,338 @@
+ 
+DOCUMENTATION FOR THE DUAL UPPER BOUND LP ( DUBLP ) PROGRAM.
+
+This program is based on the method of LP given in the appendix to chapter 6 
+of your text. The program is written in TURBO PASCAL. 
+
+To run the LP just enter DUBLP and then hit the enter key.
+
+The program asks for three things:
+
+DO YOU WANT DIAGNOSTIC OUTPUT? Y or N  --- To which you respond as you wish. 
+With the diagnostics on you get a reprint of the input file and some 
+information on which constraints are not yet satisfied as the solution 
+progresses.
+
+DO YOU WANT OUTPUT ON THE PRINTER? Y or N -- Answer Y or y to get printer 
+output. Note that if you choose diagnostics you will get them on the printer 
+also.
+
+ENTER NAME OF INPUT FILE :  -- Here you should enter the disk, directory and 
+file name as is normally done with DOS. If the file is in error or 
+can't be found a message will appear on the screen and the program will abort.
+
+With or without diagnostics you then get a display of the solution progress 
+showing pivot variables. At the end a full variable by variable output appears 
+on the screen as well as on the printer if printer output was selected. As 
+shown below, the input file allows you to enter a label for each variable 
+so that the output is rather self explanatory. NOTE  a limit of 40 iterations 
+is built into the LP and if you reach 40 the program will stop.
+
+INPUT FILE FORMAT:
+
+Line 1 and Line 2  - Title lines. May be any ASCII character string up to 80 
+characters long each.
+
+Line 3 -- contains two integer numbers separated by a space. The first is 
+the number of variables in the problem and the second is the number of 
+constraints.
+
+Line 4 -- contains the cost function coefficients. These must be floating 
+point numbers( ie they have a decimal point.) and there must be as many of them 
+as there are variables. Separate them with a space.
+
+Line 5 -- contains the cost function constant. Often the cost functions are of 
+the type   C1(X1) + C2(X2) + ...  
+
+        where C1(X1) = A1 + B1*X1
+              C2(X2) = A2 + B2*X2
+                     etc.
+
+the cost function for the LP then must consist of:
+(A1+A2+...) + B1*X1 + B2*X2 + ...
+
+The first term in this function, ie (A1 + A2 + ...) is placed into line 5 and 
+the B1, B2, ... are placed into line 4.
+
+
+Lines 6,7 ...  -- Contains one line for each constraint. Each line consists of 
+a row from the constraint tableau, that is, it contains the constraint 
+coefficients for the constraint - one for each variable. This is followed by 
+one of the symbols: = < or > to signify the type of constraint.(DO NOT put 
+single quotes or double quotes around these symbols.) finally the constraint 
+right hand side or limit is entered as a floating point number.
+
+The last group of lines contains the variable limits. Each line contains the 
+variable number followed by the variable min and max and then followed by a 
+variable label of up to 40 characters long.
+
+The example below shows the file used to solve the fuel scheduling problem in 
+example 6E.
+
+<- indicates comments only.
+
+base case data for problem in section 6.6 of text 
+--------------------------------------------------
+20 12    <- Num of variables = 20, num of constraints = 12
+<----record below is the cost function
+0.0    0.0    0.0    1811.0 0.0    1789.0 0.0    0.0    1811.0 0.0    
+0.0    1789.0 0.0    0.0    1811.0 0.0    0.0    1789.0 0.0    0.0 
+633250.8  <---- cost ftn constant
+1.0    0.0    1.0   -60.4   0.0    0.0    -1.0   0.0    0.0    0.0    
+0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0   = 2775.4
+
+0.0    1.0    0.0    0.0    1.0   -59.7   0.0    0.0    0.0   -1.0    
+0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0   = 4260.5
+
+0.0    0.0    0.0    0.0    0.0    0.0    1.0    1.0   -60.4   0.0    
+0.0    0.0   -1.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0   = 2775.4
+
+0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    1.0    
+1.0   -59.7   0.0    0.0    0.0   -1.0    0.0    0.0    0.0    0.0   = 4260.5
+
+0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    
+0.0    0.0    1.0    1.0   -60.4   0.0    0.0    0.0   -1.0    0.0   = 2775.4
+
+0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    
+0.0    0.0    0.0    0.0    0.0    1.0    1.0   -59.7   0.0   -1.0   = 4260.5
+
+0.0    0.0    1.0    0.0    1.0    0.0    0.0    0.0    0.0    0.0    
+0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0   = 40000.0
+
+0.0    0.0    0.0    0.0    0.0    0.0    0.0    1.0    0.0    0.0    
+1.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0   = 40000.0
+
+0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    
+0.0    0.0    0.0    1.0    0.0    0.0    1.0    0.0    0.0    0.0   = 40000.0
+
+0.0    0.0    0.0    1.0    0.0    1.0    0.0    0.0    0.0    0.0    
+0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0   = 1200.0
+
+0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    1.0    0.0    
+0.0    1.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0   = 1500.0
+
+0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    0.0    
+0.0    0.0    0.0    0.0    1.0    0.0    0.0    1.0    0.0    0.0   = 800.0
+
+1  70000.0   70000.0    volume coal pile 1 week 1  <---- variable 1 limits
+2  70000.0   70000.0    volume coal pile 2 week 1
+3      0.0   40000.0    coal delivery to plant 1 week 1
+4    150.0     600.0    plant 1 MW week 1
+5      0.0   40000.0    coal delivery to plant 2 week 1
+6    400.0    1000.0    plant 2 MW week 1
+7      0.0  200000.0    volume coal pile 1 week 2
+8      0.0   40000.0    coal delivery to plant 1 week 2
+9    150.0     600.0    plant 1 MW week 2
+10     0.0  200000.0    volume coal pile 2 week 2
+11     0.0   40000.0    coal delivery to plant 2 week 2
+12   400.0    1000.0    plant 2 MW week 2
+13     0.0  200000.0    volume coal pile 1 week 3
+14     0.0   40000.0    coal delivery to plant 1 week 3
+15   150.0     600.0    plant 1 MW week 3
+16     0.0  200000.0    volume coal pile 2 week 3
+17     0.0   40000.0    coal delivery to plant 2 week 3
+18   400.0    1000.0    plant 2 MW week 3
+19     0.0  200000.0    volume in coal pile 1 week 4
+20     0.0  200000.0    volume in coal pile 2 week 4 <---Variable 2 limits
+
+The disk contains these files:
+
+DUBLP.PAS Is the PASCAL source code for the LP.
+DUBLP.EXE Is the LP executable file.
+DUBLP.DOC Is this documentation file.
+LPTEST.DAT This data file contains the LP data for the problem worked out in 
+           the appendix to chapter 6.
+EX6E-1.DAT Contains the data file above for the fuel scheduling problem in 
+           example 6E.
+EX6E-2.DAT, EX6E-3.DAT are data files for the variations shown in example 6E.
+
+A sample run of DUBLP looks like:
+
+ DO YOU WANT DIAGNOSTIC OUTPUT ? (Y or N) Y <-- User chooses to see diagnostics
+
+ DO YOU WANT OUTPUT ON PRINTER? (Y or N) Y <-- Output will go to printer
+
+ ENTER NAME OF INPUT DATA FILE : EX6E-1.DAT
+
+############################# This output appear on printer ##################
+ file: ex6e-1.dat
+
+base case data for problem in section 6.6 of text ( altered to inc init V's )
+-----------------------------------------------------------------------------
+
+ Number of variables = 20
+ Numbar of constraints = 12
+
+Objective function
+ 0.0E+00  0.0E+00  0.0E+00  1.8E+03  0.0E+00
+ 1.8E+03  0.0E+00  0.0E+00  1.8E+03  0.0E+00    
+ 0.0E+00  1.8E+03  0.0E+00  0.0E+00  1.8E+03
+ 0.0E+00  0.0E+00  1.8E+03  0.0E+00  0.0E+00 
+
+Constraint 1
+ 1.0E+00  0.0E+00  1.0E+00  -6.0E+01  0.0E+00  
+ 0.0E+00  -1.0E+00  0.0E+00  0.0E+00  0.0E+00  
+ 0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  
+ 0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00     =   2.8E+03
+
+Constraint 2
+ 0.0E+00  1.0E+00  0.0E+00  0.0E+00  1.0E+00  
+-6.0E+01  0.0E+00  0.0E+00  0.0E+00  -1.0E+00  
+ 0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  
+ 0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00     =   4.3E+03
+
+Constraint 3
+ 0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  
+ 0.0E+00  1.0E+00  1.0E+00  -6.0E+01  0.0E+00  
+ 0.0E+00  0.0E+00  -1.0E+00  0.0E+00  0.0E+00  
+ 0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00     =   2.8E+03
+
+Constraint 4
+ 0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  
+ 0.0E+00  0.0E+00  0.0E+00  0.0E+00  1.0E+00  
+ 1.0E+00  -6.0E+01  0.0E+00  0.0E+00  0.0E+00  
+-1.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00     =   4.3E+03
+
+Constraint 5
+ 0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  
+ 0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  
+ 0.0E+00  0.0E+00  1.0E+00  1.0E+00  -6.0E+01  
+ 0.0E+00  0.0E+00  0.0E+00  -1.0E+00  0.0E+00     =   2.8E+03
+
+Constraint 6
+ 0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  
+ 0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  
+ 0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  
+ 1.0E+00  1.0E+00  -6.0E+01  0.0E+00  -1.0E+00     =   4.3E+03
+
+Constraint 7
+ 0.0E+00  0.0E+00  1.0E+00  0.0E+00  1.0E+00  
+ 0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  
+ 0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  
+ 0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00     =   4.0E+04
+
+Constraint 8
+ 0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  
+ 0.0E+00  0.0E+00  1.0E+00  0.0E+00  0.0E+00  
+ 1.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  
+ 0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00     =   4.0E+04
+
+Constraint 9
+ 0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  
+ 0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  
+ 0.0E+00  0.0E+00  0.0E+00  1.0E+00  0.0E+00  
+ 0.0E+00  1.0E+00  0.0E+00  0.0E+00  0.0E+00     =   4.0E+04
+
+Constraint 10
+ 0.0E+00  0.0E+00  0.0E+00  1.0E+00  0.0E+00  
+ 1.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  
+ 0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  
+ 0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00     =   1.2E+03
+
+Constraint 11
+ 0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  
+ 0.0E+00  0.0E+00  0.0E+00  1.0E+00  0.0E+00  
+ 0.0E+00  1.0E+00  0.0E+00  0.0E+00  0.0E+00  
+ 0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00     =   1.5E+03
+
+Constraint 12
+ 0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  
+ 0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  
+ 0.0E+00  0.0E+00  0.0E+00  0.0E+00  1.0E+00  
+ 0.0E+00  0.0E+00  1.0E+00  0.0E+00  0.0E+00     =   8.0E+02
+
+1  7.0000000000E+04  7.0000000000E+04 
+2  7.0000000000E+04  7.0000000000E+04
+3  4.0000000000E+04  0.0000000000E+00
+4  6.0000000000E+02  1.5000000000E+02
+5  4.0000000000E+04  0.0000000000E+00
+6  1.0000000000E+03  4.0000000000E+02
+7  2.0000000000E+05  0.0000000000E+00
+8  4.0000000000E+04  0.0000000000E+00
+9  6.0000000000E+02  1.5000000000E+02
+10  2.0000000000E+05  0.0000000000E+00
+11  4.0000000000E+04  0.0000000000E+00
+12  1.0000000000E+03  4.0000000000E+02
+13  2.0000000000E+05  0.0000000000E+00
+14  4.0000000000E+04  0.0000000000E+00
+15  6.0000000000E+02  1.5000000000E+02
+16  2.0000000000E+05  0.0000000000E+00
+17  4.0000000000E+04  0.0000000000E+00
+18  1.0000000000E+03  4.0000000000E+02
+19  2.0000000000E+05  0.0000000000E+00
+20  2.0000000000E+05  0.0000000000E+00
+
+    ITER = 0  COST =   2.9617500000E+06
+ constraint 1 violation =   5.8164600000E+04
+ constraint 2 violation =   4.1859500000E+04
+ constraint 3 violation =   1.1835400000E+04
+ constraint 4 violation =   2.8140500000E+04
+ constraint 5 violation =   1.1835400000E+04
+ constraint 6 violation =   2.8140500000E+04
+ constraint 7 violation =   4.0000000000E+04
+ constraint 8 violation =   4.0000000000E+04
+ constraint 9 violation =   4.0000000000E+04
+ constraint 10 violation =   6.5000000000E+02
+ constraint 11 violation =   9.5000000000E+02
+ constraint 12 violation =   2.5000000000E+02
+ pivot row =    1   pivot col =    1
+
+    ITER = 1  COST =   3.5950008000E+06
+ constraint 1 violation =   5.8164600000E+04
+ constraint 2 violation =   4.1859500000E+04
+ constraint 3 violation =   1.1835400000E+04
+ constraint 4 violation =   2.8140500000E+04
+ constraint 5 violation =   1.1835400000E+04
+ constraint 6 violation =   2.8140500000E+04
+ constraint 7 violation =   4.0000000000E+04
+ constraint 8 violation =   4.0000000000E+04
+ constraint 9 violation =   4.0000000000E+04
+ constraint 10 violation =   6.5000000000E+02
+ constraint 11 violation =   9.5000000000E+02
+ constraint 12 violation =   2.5000000000E+02
+ pivot row =    1   pivot col =    7
+
+    ITER = 2  COST =   3.5950008000E+06  <-- This will go up as feasibility
+                                                is approached
+ constraint 2 violation =   4.1859500000E+04
+ constraint 3 violation =   4.6329200000E+04
+ constraint 4 violation =   2.8140500000E+04
+ constraint 5 violation =   1.1835400000E+04
+ constraint 6 violation =   2.8140500000E+04     <-- Constraints will all
+ constraint 7 violation =   4.0000000000E+04          be satisfied at end
+ constraint 8 violation =   4.0000000000E+04
+ constraint 9 violation =   4.0000000000E+04
+ constraint 10 violation =   6.5000000000E+02
+ constraint 11 violation =   9.5000000000E+02
+ constraint 12 violation =   2.5000000000E+02
+ pivot row =    3   pivot col =    1
+
+           etc.
+           etc.
+
+
+    ITER = 25  COST =   6.9134508000E+06
+
+ SOLUTION   
+         XMIN         X            XMAX       VARIABLE DESCRIPTION 
+ 1   70000.0000   70000.0000   70000.0000  volume coal pile 1 week 1
+ 2   70000.0000   70000.0000   70000.0000  volume coal pile 2 week 1
+ 3       0.0000       0.0000   40000.0000  coal delivery to plant 1 week 1
+ 4     150.0000     200.0000     600.0000  plant 1 MW week 1
+ 5       0.0000   40000.0000   40000.0000  coal delivery to plant 2 week 1
+ 6     400.0000    1000.0000    1000.0000 plant 2 MW week 1
+ 7       0.0000   55144.6000  200000.0000 volume coal pile 1 week 2
+ 8       0.0000   19013.5000   40000.0000  coal delivery to plant 1 week 2
+ 9     150.0000     500.0000     600.0000  plant 1 MW week 2
+10       0.0000   46039.5000  200000.0000 volume coal pile 2 week 2
+11       0.0000   20986.5000   40000.0000 coal delivery to plant 2 week 2
+12     400.0000    1000.0000    1000.0000 plant 2 MW week 2
+13       0.0000   41182.7000  200000.0000 volume coal pile 1 week 3
+14       0.0000       0.0000   40000.0000 coal delivery to plant 1 week 3
+15     150.0000     150.0000     600.0000 plant 1 MW week 3
+16       0.0000    3065.5000  200000.0000 volume coal pile 2 week 3
+17       0.0000   40000.0000   40000.0000 coal delivery to plant 2 week 3
+18     400.0000     650.0000    1000.0000 plant 2 MW week 3
+19       0.0000   29347.3000  200000.0000 volume in coal pile 1 week 4
+20       0.0000       0.0000  200000.0000 volume in coal pile 2 week 4
+

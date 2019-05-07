@@ -1,0 +1,163 @@
+DOCUMENTATION FOR THE HYDRO PLANT PROBLEM PROGRAM  
+
+The program HYDRO.PAS contains a dynamic programming algorithm to solve 
+problem 7.4 in chapter 7 of the text. You are allowed to change much of the 
+problem data to see the result on the solution ( see sample run below ). 
+HYDRO.EXE contains the executable file.
+
+In addition, two other files on the disk allow an approximate solution of 
+problem 7.4 using linear programming. File PR74A.DAT contains the LP data for 
+this problem with the steam and hydro plant characteristics represented by 
+linear functions. File PR74B.DAT contains LP data for this problem with the 
+steam plant characteristic represented by a two segment linear approximation.
+To run these files you must use the DUBLP program explained in DUBLP.DOC.
+
+To run the full dynamic programming algorithm the user enters HYDRO
+
+Sample output of this program appears below:
+
+
+ Do you want output on printer: Y <-- User selects printer output
+
+ You may now make changes to the data for the problem 
+
+ Menu of options:
+
+1 - Display data
+2 - Enter new steam plant min MW 
+3 - Enter new steam plant max MW 
+4 - Enter new reservoir infow rate (AF/HR)
+5 - Enter new reservoir max volume (AF)
+6 - Enter new reservoir min vilume (AF)
+7 - Enter new volume step to use in algorithm
+8 - Enter new starting reservoir volume (AF)
+9 - Enter new ending reservoir volume (AF)
+10 - Run program
+
+Enter option number >1  <---User entered 1 to display data
+
+  Steam plant maximum MW    =      1200.00
+  Steam plant minimum MW    =       200.00
+  Reservoir inflow          =      1000.00
+  Reservoir maximum volume  =     18000.00
+  Reservoir minimum volume  =      6000.00
+  Volume step size          =      1000.00
+  Reservoir starting volume =     10000.00
+  Reservoir ending volume   =     10000.00
+
+
+ Menu of options:
+
+1 - Display data
+2 - Enter new steam plant min MW 
+3 - Enter new steam plant max MW 
+4 - Enter new reservoir infow rate (AF/HR)
+5 - Enter new reservoir max volume (AF)
+6 - Enter new reservoir min vilume (AF)
+7 - Enter new volume step to use in algorithm
+8 - Enter new starting reservoir volume (AF)
+9 - Enter new ending reservoir volume (AF)
+10 - Run program
+
+Enter option number > 7  <---User entered 7 to enter a new volume step size.
+
+Current value of volume step size =      1000.00
+
+Enter new value : 2000.  <---User enters 2000. as new step size.
+
+ Menu of options:
+
+1 - Display data
+2 - Enter new steam plant min MW 
+3 - Enter new steam plant max MW 
+4 - Enter new reservoir infow rate (AF/HR)
+5 - Enter new reservoir max volume (AF)
+6 - Enter new reservoir min vilume (AF)
+7 - Enter new volume step to use in algorithm
+8 - Enter new starting reservoir volume (AF)
+9 - Enter new ending reservoir volume (AF)
+10 - Run program
+
+Enter option number > 8  <---User enters 8 to enter new starting volume.
+
+Current value of reservoir starting volume =     10000.00
+
+Enter new value : 14000.  <---New starting volume set to 14000.
+
+ Menu of options:
+
+1 - Display data
+2 - Enter new steam plant min MW 
+3 - Enter new steam plant max MW 
+4 - Enter new reservoir infow rate (AF/HR)
+5 - Enter new reservoir max volume (AF)
+6 - Enter new reservoir min vilume (AF)
+7 - Enter new volume step to use in algorithm
+8 - Enter new starting reservoir volume (AF)
+9 - Enter new ending reservoir volume (AF)
+10 - Run program
+
+Enter option number > 10   <---User runs program
+
+  Steam plant maximum MW    =      1200.00
+  Steam plant minimum MW    =       200.00
+  Reservoir inflow          =      1000.00
+  Reservoir maximum volume  =     18000.00
+  Reservoir minimum volume  =      6000.00
+  Volume step size          =      2000.00
+  Reservoir starting volume =     14000.00
+  Reservoir ending volume   =     10000.00
+
+ Now doing period 2
+ Now doing period 3
+ Now doing period 4
+ Now doing period 5
+ Now doing period 6
+
+PERIOD 1
+            LOAD =          600.00  <-- Load in MW
+STEAM GENERATION =          600.00  <-- Steam generation in MW
+HYDRO GENERATION =            0.00  <-- Hydro generation in MW
+               Q =            0.00  <-- Hydro discharge in AF/HR
+RESERVOIR VOLUME =        18000.00  <-- Reservoir volume at beginning
+                                        of period 1
+
+PERIOD 2
+            LOAD =         1000.00
+STEAM GENERATION =          814.89
+HYDRO GENERATION =          185.11
+               Q =         2000.00
+RESERVOIR VOLUME =        14000.00
+
+PERIOD 3
+            LOAD =          900.00
+STEAM GENERATION =          722.45
+HYDRO GENERATION =          177.55
+               Q =         2000.00
+RESERVOIR VOLUME =        10000.00
+
+PERIOD 4
+            LOAD =          500.00
+STEAM GENERATION =          500.00
+HYDRO GENERATION =            0.00
+               Q =            0.00
+RESERVOIR VOLUME =        14000.00
+
+PERIOD 5
+            LOAD =          400.00
+STEAM GENERATION =          222.45
+HYDRO GENERATION =          177.55
+               Q =         2000.00
+RESERVOIR VOLUME =        10000.00
+
+PERIOD 6
+            LOAD =          300.00
+STEAM GENERATION =          226.00
+HYDRO GENERATION =           74.00
+               Q =         1000.00
+RESERVOIR VOLUME =        10000.00
+
+TOTAL PRODUCTION COST FOR SCHEDULE =        87824.31  <---Total production 
+                                                          cost on steam plant.
+
+

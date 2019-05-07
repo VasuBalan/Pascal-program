@@ -1,0 +1,28 @@
+
+
+***INTERESTING EXPERIMENTS WITH UNITCOM
+
+The student cannot possibly carry out the exhaustive calculations for the 
+unit commitment problems by hand that can be run by UNITCOM. Therefore it 
+gives the student a chance to see first hand how the dynamic programming 
+solution is affected by changing the selection of the priority order or 
+enumeration scheme and the N and X parameters.
+
+Be aware!! If you constrict the solution too much you will very likely end up 
+with no feasible solution. 
+
+For those problems that allow a solution with either complete enumeration and 
+priority order try to get a feel for the difference in run time to see why 
+enumeration is not a viable alternative even though it may vary well give a 
+slightly better solution. Also, for that matter, notice the rather small 
+difference in optimum cost from a feasible schedule with one method versus 
+another ( ie by choosing different X and N values as well as the choice of 
+priority order vs. enumeration ) is the cost savings of the best schedule 
+worth the extra effort?
+
+Use the UNITCOM2.DAT file, which has eight units, with complete 
+enumeration and let the number of states to be evaluated be 32 for X and 
+for N. This will give a very long running solution since 32x32 
+transitions are being tried each time period. Compare time and results 
+to priority order with only eight states for X and N.
+
